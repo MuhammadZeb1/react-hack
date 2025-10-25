@@ -10,7 +10,7 @@ export default function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-10">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <NavLink to="/" className="text-xl font-bold">
-          Mini Store
+          my Store
         </NavLink>
         <nav className="flex items-center gap-4">
           <NavLink
@@ -41,4 +41,3 @@ export default function Header() {
     </header>
   );
 }
-    

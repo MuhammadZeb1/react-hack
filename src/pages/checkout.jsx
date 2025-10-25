@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { clearCart } from '../features/cart/cartSlice' // آپ اپنے path کے مطابق ایڈجسٹ کریں
+import { useDispatch, useSelector } from 'react-redux'
+import { clearCart } from '../features/cart/cartSlice'
 
-export default function Checkout({ items, total }) {
+export default function Checkout() {
+  const items = useSelector((state) => state.cart.items) // ✅ Correct variable
   const dispatch = useDispatch()
+
   const [form, setForm] = useState({ name: '', email: '', address: '', phone: '' })
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
+
+  // ✅ Calculate total dynamically from items
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -15,12 +20,12 @@ export default function Checkout({ items, total }) {
   function handleSubmit(e) {
     e.preventDefault()
     if (items.length === 0) return alert('Cart is empty')
+
     setSubmitting(true)
-    // simulate order API
     setTimeout(() => {
       setSubmitting(false)
       setSuccess(true)
-      dispatch(clearCart())
+      dispatch(clearCart()) // ✅ clear cart
     }, 800)
   }
 
@@ -29,6 +34,7 @@ export default function Checkout({ items, total }) {
       <h2 className="text-2xl font-semibold">Checkout</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Form Section */}
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-3">
           <label className="block">
             <div className="text-sm mb-1">Name</div>
@@ -54,9 +60,10 @@ export default function Checkout({ items, total }) {
             {submitting ? 'Processing...' : 'Place Order'}
           </button>
 
-          {success && <div className="text-green-600">Order placed successfully! Thank you 🎉</div>}
+          {success && <div className="text-green-600">Order placed successfully! 🎉</div>}
         </form>
 
+        {/* Order Summary */}
         <div className="bg-white p-4 rounded shadow">
           <h3 className="font-semibold mb-3">Order Summary</h3>
 
@@ -70,7 +77,9 @@ export default function Checkout({ items, total }) {
                   <div>{i.qty} × ${i.price.toFixed(2)}</div>
                 </div>
               ))}
-              <div className="border-t pt-2 mt-2 text-right font-semibold">Total: ${total.toFixed(2)}</div>
+              <div className="border-t pt-2 mt-2 text-right font-semibold">
+                Total: ${total.toFixed(2)}
+              </div>
             </div>
           )}
         </div>
