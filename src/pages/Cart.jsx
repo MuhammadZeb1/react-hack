@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import {
   increaseQty,
   decreaseQty,
@@ -13,6 +15,8 @@ export default function Cart() {
   const items = useSelector((state) => state.cart.items);
   const total = items.reduce((s, i) => s + i.qty * i.price, 0);
 
+  const [confirmDelete, setConfirmDelete] = useState({ show: false, id: null, title: "" });
+
   if (items.length === 0)
     return (
       <div className="text-center py-20">
@@ -23,14 +27,31 @@ export default function Cart() {
       </div>
     );
 
-  const handleRemove = (id, title) => {
-    if (window.confirm(`Are you sure you want to remove "${title}" from the cart?`)) {
-      dispatch(removeFromCart(id));
-    }
+  const openConfirm = (id, title) => {
+    setConfirmDelete({ show: true, id, title });
+  };
+
+  const handleContinue = () => {
+    dispatch(removeFromCart(confirmDelete.id));
+    toast.success(`✅ "${confirmDelete.title}" removed from cart!`);
+    setConfirmDelete({ show: false, id: null, title: "" });
+  };
+
+  const handleCancel = () => {
+    setConfirmDelete({ show: false, id: null, title: "" });
   };
 
   return (
     <div className="space-y-4">
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
+
       <h2 className="text-2xl font-semibold">Your Cart</h2>
       <div className="space-y-3">
         {items.map((item) => (
@@ -57,7 +78,7 @@ export default function Cart() {
               </button>
 
               <button
-                onClick={() => handleRemove(item.id, item.title)}
+                onClick={() => openConfirm(item.id, item.title)}
                 className="px-3 py-1 border rounded text-red-600"
               >
                 Remove
@@ -88,6 +109,32 @@ export default function Cart() {
           </Link>
         </div>
       </div>
+
+      {/* Custom confirmation modal */}
+      {confirmDelete.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
+            <h3 className="text-lg font-semibold mb-3">Remove item?</h3>
+            <p className="mb-4">
+              Are you sure you want to remove <strong>{confirmDelete.title}</strong> from the cart?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleContinue}
+                className="px-4 py-2 bg-red-600 text-white rounded"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

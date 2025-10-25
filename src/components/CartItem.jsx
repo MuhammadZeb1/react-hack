@@ -1,7 +1,17 @@
 import React from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CartItem({ item, onInc, onDec, onRemove }) {
+  const handleRemove = () => {
+    const confirmed = window.confirm(`Are you sure you want to remove "${item.title}" from the cart?`);
+    if (confirmed) {
+      onRemove(item.id);
+      toast.success(`${item.title} removed from cart! ✅`);
+    }
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200">
       
@@ -42,7 +52,7 @@ export default function CartItem({ item, onInc, onDec, onRemove }) {
 
       {/* Remove Button */}
       <button
-        onClick={() => onRemove(item.id)}
+        onClick={handleRemove}
         className="mt-2 sm:mt-0 ml-auto sm:ml-2 text-red-600 hover:text-red-800 transition"
       >
         <Trash2 size={20} />
