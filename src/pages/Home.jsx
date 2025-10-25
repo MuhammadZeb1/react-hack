@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../components/ProductCard";
 import { fetchProducts } from "../features/products/productsSlice";
 import { addToCart } from "../features/cart/cartSlice";
-
+import Hero from "../components/Hero";
 export default function Home() {
   const dispatch = useDispatch();
   const { items, status, maxPrice } = useSelector((state) => state.products);
@@ -23,7 +23,14 @@ export default function Home() {
   );
 
   return (
-    <div>
+    <div className="space-y-10">
+
+      {/* ✅ Hero Section */}
+      <section className="">
+        <Hero />
+      </section>
+
+      {/* ✅ Price Filter Section */}
       <div className="mb-6 bg-white p-4 rounded shadow">
         <h2 className="text-lg font-semibold mb-2">Products</h2>
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
@@ -48,6 +55,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ✅ Products Grid */}
       {status === "loading" ? (
         <div className="text-center py-20">Loading...</div>
       ) : (
