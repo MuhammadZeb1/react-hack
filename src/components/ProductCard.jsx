@@ -1,25 +1,28 @@
-import React from "react";
+import { ShoppingCart } from "lucide-react";
 
 export default function ProductCard({ product, onAdd }) {
   return (
-    <div className="bg-white rounded-lg shadow p-4 flex flex-col hover:shadow-md transition">
-      <div className="h-40 flex items-center justify-center mb-3">
-        <img
-          src={product.image}
-          alt={product.title}
-          className="max-h-36 object-contain"
-        />
-      </div>
-      <h3 className="text-sm font-medium mb-2 line-clamp-2">{product.title}</h3>
-      <p className="text-gray-600 text-sm mb-3 truncate">{product.category}</p>
-      <div className="mt-auto flex items-center justify-between">
-        <div className="text-lg font-semibold">${product.price.toFixed(2)}</div>
-        <button
-          onClick={() => onAdd(product)}
-          className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-        >
-          Add
-        </button>
+    <div className="h-full flex flex-col bg-white shadow-md rounded-lg overflow-hidden">
+      <img
+        src={product.image}
+        alt={product.title}
+        className="h-48 w-full object-contain p-4"
+      />
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="text-md font-semibold mb-2 line-clamp-2">
+          {product.title}
+        </h3>
+
+        <div className="mt-4 flex justify-between items-center">
+          <span className="text-lg font-bold">${product.price}</span>
+          <button
+            onClick={() => onAdd(product)}
+            className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition"
+          >
+            <ShoppingCart size={18} />
+            Add to Cart
+          </button>
+        </div>
       </div>
     </div>
   );
