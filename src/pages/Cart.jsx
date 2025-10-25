@@ -1,7 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import CartItem from "../components/CartItem";
 import {
   increaseQty,
   decreaseQty,
@@ -24,18 +23,47 @@ export default function Cart() {
       </div>
     );
 
+  const handleRemove = (id, title) => {
+    if (window.confirm(`Are you sure you want to remove "${title}" from the cart?`)) {
+      dispatch(removeFromCart(id));
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold">Your Cart</h2>
       <div className="space-y-3">
         {items.map((item) => (
-          <CartItem
-            key={item.id}
-            item={item}
-            onInc={(id) => dispatch(increaseQty(id))}
-            onDec={(id) => dispatch(decreaseQty(id))}
-            onRemove={(id) => dispatch(removeFromCart(id))}
-          />
+          <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded shadow">
+            <div>
+              <div className="font-semibold">{item.title}</div>
+              <div className="text-gray-500 text-sm">
+                ${item.price.toFixed(2)} × {item.qty}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => dispatch(decreaseQty(item.id))}
+                className="px-2 py-1 border rounded"
+              >
+                -
+              </button>
+              <button
+                onClick={() => dispatch(increaseQty(item.id))}
+                className="px-2 py-1 border rounded"
+              >
+                +
+              </button>
+
+              <button
+                onClick={() => handleRemove(item.id, item.title)}
+                className="px-3 py-1 border rounded text-red-600"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
         ))}
       </div>
 

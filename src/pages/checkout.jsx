@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearCart } from '../features/cart/cartSlice'
+import { User, Mail, Home as HomeIcon, Phone, ShoppingCart } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function Checkout() {
-  const items = useSelector((state) => state.cart.items) // ✅ Correct variable
+  const items = useSelector((state) => state.cart.items)
   const dispatch = useDispatch()
 
   const [form, setForm] = useState({ name: '', email: '', address: '', phone: '' })
   const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState(false)
 
-  // ✅ Calculate total dynamically from items
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   function handleChange(e) {
@@ -19,71 +21,135 @@ export default function Checkout() {
 
   function handleSubmit(e) {
     e.preventDefault()
-    if (items.length === 0) return alert('Cart is empty')
+    if (items.length === 0) {
+      toast.error("🛒 Cart is empty!")
+      return
+    }
 
     setSubmitting(true)
     setTimeout(() => {
       setSubmitting(false)
-      setSuccess(true)
-      dispatch(clearCart()) // ✅ clear cart
+      toast.success("✅ Order placed successfully!")
+      dispatch(clearCart())
+      setForm({ name: '', email: '', address: '', phone: '' })
     }, 800)
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <h2 className="text-2xl font-semibold">Checkout</h2>
+    <div className="max-w-2xl mx-auto px-3 py-6 space-y-6">
+      <ToastContainer
+        position="top-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Form Section */}
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-3">
-          <label className="block">
-            <div className="text-sm mb-1">Name</div>
-            <input name="name" value={form.name} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
-          </label>
+      <motion.h2
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-2xl font-bold text-gray-800 text-center"
+      >
+        Checkout
+      </motion.h2>
 
-          <label className="block">
-            <div className="text-sm mb-1">Email</div>
-            <input name="email" type="email" value={form.email} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
-          </label>
+      {/* Order Summary */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white p-4 rounded-lg shadow-md space-y-3"
+      >
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <ShoppingCart size={18} /> Order Summary
+        </h3>
 
-          <label className="block md:col-span-2">
-            <div className="text-sm mb-1">Address</div>
-            <textarea name="address" value={form.address} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
-          </label>
-
-          <label className="block">
-            <div className="text-sm mb-1">Phone</div>
-            <input name="phone" value={form.phone} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
-          </label>
-
-          <button type="submit" disabled={submitting} className="w-full bg-blue-600 text-white py-2 rounded">
-            {submitting ? 'Processing...' : 'Place Order'}
-          </button>
-
-          {success && <div className="text-green-600">Order placed successfully! 🎉</div>}
-        </form>
-
-        {/* Order Summary */}
-        <div className="bg-white p-4 rounded shadow">
-          <h3 className="font-semibold mb-3">Order Summary</h3>
-
-          {items.length === 0 ? (
-            <div className="text-sm text-gray-600">No items in cart.</div>
-          ) : (
-            <div className="space-y-2">
-              {items.map(i => (
-                <div key={i.id} className="flex justify-between text-sm">
-                  <div className="truncate w-48">{i.title}</div>
-                  <div>{i.qty} × ${i.price.toFixed(2)}</div>
+        {items.length === 0 ? (
+          <div className="text-gray-500 text-sm">No items in cart.</div>
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.1 } }
+            }}
+            className="space-y-2"
+          >
+            {items.map((i) => (
+              <motion.div
+                key={i.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex justify-between items-center text-sm border-b pb-1"
+              >
+                <div className="truncate w-36">{i.title}</div>
+                <div className="flex gap-1">
+                  <span className="font-semibold">${i.price.toFixed(2)}</span>
+                  <span className="text-gray-500">×{i.qty}</span>
                 </div>
-              ))}
-              <div className="border-t pt-2 mt-2 text-right font-semibold">
-                Total: ${total.toFixed(2)}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+              </motion.div>
+            ))}
+
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="pt-2 border-t text-right font-bold text-md"
+            >
+              Total: ${total.toFixed(2)}
+            </motion.div>
+          </motion.div>
+        )}
+      </motion.div>
+
+      {/* Checkout Form */}
+      <motion.form
+        onSubmit={handleSubmit}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="bg-white p-4 rounded-lg shadow-md space-y-3"
+      >
+        {/** Input fields with animation **/}
+        {[{name:"name", icon:User, placeholder:"Full Name"},
+          {name:"email", icon:Mail, placeholder:"Email Address", type:"email"},
+          {name:"address", icon:HomeIcon, placeholder:"Address"},
+          {name:"phone", icon:Phone, placeholder:"Phone Number"}].map((field, idx) => (
+          <motion.div
+            key={field.name}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 * idx }}
+            className="flex items-center gap-2 border px-2 py-1.5 rounded-lg focus-within:ring focus-within:ring-indigo-300"
+          >
+            <field.icon className="text-gray-400" size={16} />
+            <input
+              name={field.name}
+              type={field.type || "text"}
+              placeholder={field.placeholder}
+              value={form[field.name]}
+              onChange={handleChange}
+              required
+              className="flex-1 outline-none text-sm"
+            />
+          </motion.div>
+        ))}
+
+        <motion.button
+          type="submit"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          disabled={submitting}
+          className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold shadow-sm hover:bg-indigo-700 transition text-sm"
+        >
+          {submitting ? 'Processing...' : 'Place Order'}
+        </motion.button>
+      </motion.form>
     </div>
   )
 }
